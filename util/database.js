@@ -1,16 +1,34 @@
-const mysql = require('mysql2')
+const mongodb = require('mongodb')
 require('dotenv').config()
+const MongoClient = mongodb.MongoClient
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD
-})
+let db
 
-module.exports = pool.promise()
 
-//Sorry.... please dont push anything if you forked my repo.
-//I forgot to add .env in .gitignore :<
+exports.mongoConnect = (callback) => {
+    MongoClient.connect(process.env.MONGODB_URL, { 
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(client => {
+        console.log('Connected to Database')
+        db = client.db('m0920-shop')
+        callback()
+    }).catch(err => console.log(err))
+}
 
-//I removed it now.... you may clone/fork
+exports.getDB = () => {
+    if(db) {
+        return db
+    } else {
+        throw 'No database found'
+    }
+}
+
+// const mongoConnect = () => {
+//     MongoClient.connect(process.env.MONGODB_URL).then(client => {
+//         console.log(client);
+//     }).catch(err => console.log(err))
+// }
+
+// mongoConnect()
+// module.exports = mongoConnect
